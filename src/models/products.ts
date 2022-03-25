@@ -1,7 +1,7 @@
 import client from '../database'
 
 export type Product = {
-  id: number
+  id?: number
   name: string
   price: number
 }
@@ -22,7 +22,7 @@ export class ProductStore {
     }
   }
 
-  static async show(id: string): Promise<Product> {
+  static async show(id: number): Promise<Product> {
     try {
       const sql = 'SELECT * FROM products WHERE id=($1)'
       const conn = await client.connect()
@@ -37,13 +37,13 @@ export class ProductStore {
     }
   }
 
-  static async create(b: Product): Promise<Product> {
+  static async create(p: Product): Promise<Product> {
     try {
       const sql =
-        'INSERT INTO books (title, author, total_pages, summary) VALUES($1, $2, $3, $4) RETURNING *'
+        'INSERT INTO products (name, price) VALUES($1, $2) RETURNING *'
       const conn = await client.connect()
 
-      const result = await conn.query(sql, [])
+      const result = await conn.query(sql, [p.name, p.price])
 
       const product = result.rows[0]
 
@@ -51,24 +51,7 @@ export class ProductStore {
 
       return product
     } catch (err) {
-      throw new Error(`Could not add new product ${b.name}. Error: ${err}`)
-    }
-  }
-
-  static async delete(id: string): Promise<Product> {
-    try {
-      const sql = 'DELETE FROM product WHERE id=($1)'
-      const conn = await client.connect()
-
-      const result = await conn.query(sql, [id])
-
-      const product = result.rows[0]
-
-      conn.release()
-
-      return product
-    } catch (err) {
-      throw new Error(`Could not delete product ${id}. Error: ${err}`)
+      throw new Error(`Could not add new product ${p.name}. Error: ${err}`)
     }
   }
 }

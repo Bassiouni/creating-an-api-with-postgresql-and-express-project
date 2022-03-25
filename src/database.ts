@@ -20,6 +20,4 @@ const client = new Pool({
   password: PG_PASSWD,
 })
 
-console.log(ENV)
-
 export default client
