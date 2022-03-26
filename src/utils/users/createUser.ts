@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { UserStore } from '../../models/users'
 import bcrypt from 'bcrypt'
-import * as dotenv from 'dotenv'
+import dotenv from 'dotenv'
 import jwt from 'jsonwebtoken'
 
 dotenv.config()
@@ -13,14 +13,14 @@ const {
 } = process.env
 
 export async function createUser(req: Request, res: Response) {
-  const { firstName, lastName, password: pwd } = req.body
+  const { firstname, lastname, password: pwd } = req.body
   const salt = await bcrypt.genSalt(parseInt(saltRounds as string))
   const password = await bcrypt.hash(pwd + pepper, salt)
 
   try {
     const createdUser = await UserStore.create({
-      firstName,
-      lastName,
+      firstname,
+      lastname,
       password,
     })
     const data = jwt.sign(createdUser, TOKEN_SECRET as string)

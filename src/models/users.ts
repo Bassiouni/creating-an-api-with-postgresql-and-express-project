@@ -2,8 +2,8 @@ import client from '../database'
 
 export type User = {
   id?: number
-  firstName: string
-  lastName: string
+  firstname: string
+  lastname: string
   password: string
 }
 
@@ -41,18 +41,19 @@ export class UserStore {
   static async create(u: User): Promise<User> {
     try {
       const sql =
-        'INSERT INTO users (firstname, lastname, password) VALUES($1, $2, $3) RETURNING *'
+        'INSERT INTO users (firstName, lastName, password) VALUES($1, $2, $3) RETURNING *'
       const conn = await client.connect()
 
       const result = await conn.query(sql, [
-        u.firstName,
-        u.lastName,
+        u.firstname,
+        u.lastname,
         u.password,
       ])
 
       const user = result.rows[0]
 
       conn.release()
+      console.log(user)
 
       return user
     } catch (err) {

@@ -6,8 +6,8 @@
   "scripts": {
     "start": "db-migrate up all && npm run build && node ./build/server.js",
     "jasmine": "jasmine",
-    "test": "ENV=test db-migrate --env test up && jasmine-ts && db-migrate db:drop test",
-    "dev": "ENV=dev db-migrate --env dev up && nodemon ./src/server.ts",
+    "test": "db-migrate --env test up && npm run build && ENV=test jasmine && db-migrate db:drop storefront_test",
+    "dev": "db-migrate --env dev up && nodemon ./src/server.ts",
     "clean": "rimraf build/",
     "build": "npm run clean && npx tsc",
     "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx}'",
@@ -47,7 +47,6 @@
     "eslint-plugin-prettier": "^4.0.0",
     "jasmine": "^4.0.2",
     "jasmine-spec-reporter": "^7.0.0",
-    "jasmine-ts": "^0.4.0",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1",
     "rimraf": "^3.0.2",

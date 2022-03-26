@@ -1,4 +1,4 @@
-import express from 'express'
+import * as express from 'express'
 import { ordersApi } from './orders'
 import { productsApi } from './products'
 import { usersApi } from './users'

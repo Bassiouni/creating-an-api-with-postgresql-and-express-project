@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { OrderStore } from '../../models/orders'
-import jwt from 'jsonwebtoken'
+import * as jwt from 'jsonwebtoken'
 import { User } from '../../models/users'
 import * as dotenv from 'dotenv'
 

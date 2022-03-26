@@ -1,76 +1,138 @@
-// import { Response } from 'superagent'
-// import supertest from 'supertest'
+import { UserSpec, createdUserInDatabase } from './users.spec'
+import { OrderSpec } from './orders.spec'
+import { ProductSpec, createProductInDatabase } from './products.spec'
+import { app } from '../server'
+import supertest from 'supertest'
+import { Response } from 'superagent'
+import bcrypt from 'bcrypt'
+import dotenv from 'dotenv'
 
-// import app from '../index'
+dotenv.config()
 
-// const request = supertest(app)
+UserSpec()
+ProductSpec()
+OrderSpec()
 
-// let response: Response
+const request = supertest(app)
+let res: Response
+const globals = {
+  token: '',
+  id: 2,
+  name: 'ProDuctSpec',
+  price: 20,
+  quantity: 1,
+  product_id: 1,
+}
 
-import { ProductStore } from '../models/products'
-
-describe('Book Model', () => {
-  it('should have an index method', () => {
-    expect(ProductStore.index).toBeDefined()
-  })
-
-  it('should have a show method', () => {
-    expect(ProductStore.show).toBeDefined()
-  })
-
-  it('should have a create method', () => {
-    expect(ProductStore.create).toBeDefined()
-  })
-
-  it('should have a delete method', () => {
-    expect(ProductStore.delete).toBeDefined()
-  })
-
-  it('create method should add a book', async () => {
-    const result = await ProductStore.create({
-      title: 'Bridge to Terabithia',
-      total_pages: 250,
-      author: 'Katherine Paterson',
-      type: 'Childrens',
+describe('Testing /user endpont', async () => {
+  it('creates a user', async () => {
+    res = await request.post('/user').send({
+      firstname: 'John',
+      lastname: 'Doe',
+      password: 'password',
     })
-
-    expect(result).toEqual({
-      id: '1',
-      title: 'Bridge to Terabithia',
-      total_pages: 250,
-      author: 'Katherine Paterson',
-      type: 'Childrens',
-    })
+    expect(res.status).toEqual(200)
+    globals.token = res.body
   })
 
-  it('index method should return a list of books', async () => {
-    const result = await ProductStore.index()
-    expect(result).toEqual([
+  it('connects to the server with 200 OK', async () => {
+    res = await request.get('/user').send(globals)
+    expect(res.status).toEqual(200)
+  })
+
+  const { SALT_ROUNDS: saltRounds, BCRYPT_PASSWORD: pepper } = process.env
+  const salt = await bcrypt.genSalt(parseInt(saltRounds as string))
+  const password = await bcrypt.hash('password' + pepper, salt)
+
+  it('views the created users', async () => {
+    res = await request.get('/user').send(globals)
+    expect(res.status).toEqual(200)
+    expect(res.body).toEqual([
+      createdUserInDatabase,
       {
-        id: '1',
-        title: 'Bridge to Terabithia',
-        total_pages: 250,
-        author: 'Katherine Paterson',
-        type: 'Childrens',
+        id: 2,
+        firstname: 'John',
+        lastname: 'Doe',
+        password,
       },
     ])
   })
 
-  it('show method should return the correct book', async () => {
-    const result = await ProductStore.show('1')
-    expect(result).toEqual({
-      id: '1',
-      title: 'Bridge to Terabithia',
-      total_pages: 250,
-      author: 'Katherine Paterson',
-      type: 'Childrens',
+  it('views the created second user', async () => {
+    res = await request.get('/user/2').send(globals)
+    expect(res.status).toEqual(200)
+    expect(res.body).toEqual({
+      id: 2,
+      firstname: 'John',
+      lastname: 'Doe',
+      password,
+    })
+  })
+})
+
+describe('Testing /product endpoint', () => {
+  beforeAll(async () => {
+    res = await request.get('/product')
+  })
+
+  it('status 200', () => {
+    expect(res.statusCode).toEqual(200)
+  })
+
+  it('response data is valid', () => {
+    expect(res.body).toEqual([createProductInDatabase])
+  })
+
+  it('creates a new product', async () => {
+    res = await request.post('/product').send(globals)
+    expect(res.status).toEqual(200)
+  })
+
+  it('checks for created product', async () => {
+    res = await request.get('/product/2')
+    expect(res.body).toEqual({
+      id: globals.id,
+      name: globals.name,
+      price: globals.price,
     })
   })
 
-  it('delete method should remove the book', async () => {
-    ProductStore.delete('1')
-    const result = await ProductStore.index()
+  it('gets a single created product', async () => {
+    res = await request.get('/product/2')
+    expect(res.status).toEqual(200)
+    expect(res.body).toEqual({
+      id: globals.id,
+      name: globals.name,
+      price: globals.price,
+    })
+  })
+})
 
-    expect(result).toEqual([])
+describe('Testing /orders endpoint', () => {
+  beforeAll(async () => {
+    res = await request.get('/order/2').send(globals)
+  })
+
+  it('gets the orders of current user with status 200', () => {
+    expect(res.status).toEqual(200)
+    expect(res.body).toEqual([])
+  })
+
+  it('creates a new order', async () => {
+    res = await request.post('/order').send(globals)
+    expect(res.status).toEqual(200)
+  })
+
+  it('checks for orders list', async () => {
+    res = await request.get('/order/2').send(globals)
+    expect(res.status).toEqual(200)
+    expect(res.body).toEqual([
+      {
+        id: globals.id,
+        quantity: globals.quantity,
+        user_id: globals.id,
+        product_id: globals.product_id,
+      },
+    ])
   })
 })
