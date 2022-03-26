@@ -54,3 +54,5 @@ Use with `npm run`:
 
 - Tokens are created when a user is created
 - There is no use of an Authorization header
+- The server starts at port 3000
+- The database runs locally so it depends on your system
