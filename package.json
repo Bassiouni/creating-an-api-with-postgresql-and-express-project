@@ -4,8 +4,7 @@
   "main": "src/server.ts",
   "license": "MIT",
   "scripts": {
-    "start": "db-migrate up all && npm run build && node ./build/server.js",
-    "jasmine": "jasmine",
+    "start": "db-migrate up && npm run build && node ./build/server.js",
     "test": "db-migrate --env test up && npm run build && ENV=test jasmine && db-migrate db:drop storefront_test",
     "dev": "db-migrate --env dev up && nodemon ./src/server.ts",
     "clean": "rimraf build/",

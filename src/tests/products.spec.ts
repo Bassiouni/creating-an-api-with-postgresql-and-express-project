@@ -22,7 +22,6 @@ export function ProductSpec() {
 
     it('create method should add a product', async () => {
       const result = await ProductStore.create(createProductInDatabase)
-      console.log(result, 33333333333333)
       expect(result).toEqual(createProductInDatabase)
     })
 
