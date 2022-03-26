@@ -28,11 +28,28 @@ These are the notes from a meeting with the frontend developer that describe wha
 - price
 - [OPTIONAL] category
 
+```
+Table: products (
+  id: Serial [Primary key],
+  name: VarChar,
+  price: Int
+)
+```
+
 #### User
 - id
 - firstName
 - lastName
 - password
+
+```
+Table: users (
+  id: Serial [Primary key],
+  firstName: VarChar,
+  lastName: VarChar,
+  password: Text
+);
+```
 
 #### Orders
 - id
@@ -41,3 +58,11 @@ These are the notes from a meeting with the frontend developer that describe wha
 - user_id
 - status of order (active or complete)
 
+```
+Table: orders (
+  id: Serial [Primary Key],
+  quantity: Int,
+  user_id: INT foreign key to users table,
+  product_id Int foreign key products table
+);
+```
