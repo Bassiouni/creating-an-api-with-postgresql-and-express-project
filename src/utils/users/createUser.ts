@@ -16,8 +16,18 @@ export async function createUser(req: Request, res: Response) {
   const { firstName, lastName, password: pwd } = req.body
   const salt = await bcrypt.genSalt(parseInt(saltRounds as string))
   const password = await bcrypt.hash(pwd + pepper, salt)
-  const createdUser = await UserStore.create({ firstName, lastName, password })
 
-  const data = jwt.sign(createdUser, TOKEN_SECRET as string)
-  res.status(200).json(data)
+  try {
+    const createdUser = await UserStore.create({
+      firstName,
+      lastName,
+      password,
+    })
+    const data = jwt.sign(createdUser, TOKEN_SECRET as string)
+    res.status(200).json(data)
+  } catch {
+    res
+      .status(400)
+      .send('please provide a proper user JSON object to create a user')
+  }
 }

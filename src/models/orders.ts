@@ -8,51 +8,40 @@ export type Order = {
 }
 
 export class OrderStore {
-  static async index(): Promise<Order[]> {
+  static async show(userId: number): Promise<Order[]> {
     try {
+      const sql = 'SELECT * FROM orders WHERE user_id=($1)'
       const conn = await client.connect()
-      const sql = 'SELECT * FROM orders'
 
-      const result = await conn.query(sql)
+      const result = await conn.query(sql, [userId])
 
       conn.release()
 
       return result.rows
     } catch (err) {
-      throw new Error(`Could not get products. Error: ${err}`)
+      throw new Error(`Could not find order ${userId}. Error: ${err}`)
     }
   }
 
-  static async show(id: number): Promise<Order> {
+  static async create(o: Order): Promise<Order> {
     try {
-      const sql = 'SELECT * FROM products WHERE id=($1)'
+      const sql =
+        'INSERT INTO orders (quantity, user_id, product_id) VALUES($1, $2, $3) RETURNING *'
       const conn = await client.connect()
 
-      const result = await conn.query(sql, [id])
+      const result = await conn.query(sql, [
+        o.quantity,
+        o.user_id,
+        o.product_id,
+      ])
+
+      const order = result.rows[0]
 
       conn.release()
 
-      return result.rows[0]
+      return order
     } catch (err) {
-      throw new Error(`Could not find product ${id}. Error: ${err}`)
+      throw new Error(`Could not add new product ${o}. Error: ${err}`)
     }
   }
-
-  // static async create(p: Order): Promise<Order> {
-  //   try {
-  //     const sql =
-  //       'INSERT INTO products (name, price) VALUES($1, $2) RETURNING *'
-  //     const conn = await client.connect()
-
-  //     const result = await conn.query(sql, [p.name, p.price])
-
-  //     const product = result.rows[0]
-
-  //     conn.release()
-
-  //     return product
-  //   } catch (err) {
-  //     throw new Error(`Could not add new product ${p.name}. Error: ${err}`)
-  //   }
-  // }
 }
