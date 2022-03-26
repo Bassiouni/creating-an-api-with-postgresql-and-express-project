@@ -56,7 +56,7 @@ export class UserStore {
 
       return user
     } catch (err) {
-      throw new Error(`Could not add new user ${u}. Error: ${err}`)
+      throw new Error(`Could not add new user ${{ ...u }}. Error: ${err}`)
     }
   }
 }

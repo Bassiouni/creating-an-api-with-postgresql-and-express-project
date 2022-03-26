@@ -41,7 +41,7 @@ export class OrderStore {
 
       return order
     } catch (err) {
-      throw new Error(`Could not add new product ${o}. Error: ${err}`)
+      throw new Error(`Could not add new order ${{ ...o }}. Error: ${err}`)
     }
   }
 }
